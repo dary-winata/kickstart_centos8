@@ -1,0 +1,6 @@
+iso/*
+vars/private
+ks/private
+roles/private
+*.box
+packer.json

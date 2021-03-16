@@ -1,0 +1,63 @@
+{
+    "variables": {
+        "software_type": "",
+        "iso_name": "",
+        "iso_repo": "",
+        "iso_key": "",
+        "iso_key_type": "",
+        "cpu": "",
+        "ram": "",
+        "disk_size": "",
+        "ks_path": "",
+        "vm_name": "",
+        "ansible_playbook": "",
+        "output_name": ""
+    },
+    "builders": [{
+        "type": "{{user 'software_type'}}-iso",
+        "guest_os_type": "RedHat_64",
+        "boot_command": [
+            "<esc>",
+            "<wait>linux inst.ks={{user 'ks_path'}}<enter>"
+        ],
+        "boot_wait": "10s",
+
+        "iso_urls": [
+            "iso/{{user 'iso_name'}}",
+            "{{user 'iso_repo'}}"
+        ],
+        "iso_checksum": "{{user 'iso_key'}}",
+        "iso_checksum_type": "{{user 'iso_key_type'}}",
+
+        "ssh_username": "vagrant",
+        "ssh_password": "vagrant",
+        "ssh_port": 22,
+        "ssh_wait_timeout": "10000s",
+        "vboxmanage": [
+            [
+                "modifyvm",
+                "{{.Name}}",
+                "--memory",
+                "{{user 'ram'}}"
+            ],
+            [
+                "modifyvm",
+                "{{.Name}}",
+                "--cpu",
+                "{{user 'cpu'}}"
+            ]
+        ],
+        "disk_size": "{{user 'disk_size'}}",
+        "headless": "false",
+        "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
+        "vm_name": "{{user 'vm_name'}}"
+    }],
+    "provision": [{
+        "type": "ansible",
+        "playbook_file": "{{user 'ansible_playbook}}"
+    }],
+    "post-processors": [{
+        "type": "vagrant",
+        "output": "{{name 'output_name'}}.box"
+    }]
+}
